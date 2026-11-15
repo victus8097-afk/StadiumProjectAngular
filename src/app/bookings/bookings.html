@@ -1,0 +1,139 @@
+<div class="workspace">
+  <header class="page-heading">
+    <div>
+      <p class="kicker">Reservations</p>
+      <h1>Booking schedule</h1>
+    </div>
+    <a class="button secondary" routerLink="/stadiums">Manage stadiums</a>
+  </header>
+  @if (schedule$ | async; as view) {
+    <section class="panel">
+      <div class="toolbar">
+        <label
+          >Stadium<select [disabled]="busy()" #picker (change)="selectStadium(picker.value)">
+            @if (!view.stadium) {
+              <option selected disabled>Select a stadium</option>
+            }
+            @for (s of view.stadiums; track s.id) {
+              <option [value]="s.id" [selected]="s.id === view.stadium?.id">
+                {{ s.name }} · {{ s.location }}
+              </option>
+            }
+          </select></label
+        >
+        <button
+          class="secondary"
+          (click)="view.stadium ? refreshSchedule.next() : reload.next()"
+          [disabled]="view.loading || busy()"
+        >
+          Refresh
+        </button>
+      </div>
+      @if (error()) {
+        <p role="alert" class="alert">{{ error() }}</p>
+      }
+      @if (message()) {
+        <p role="status" class="success">{{ message() }}</p>
+      }
+      @if (draft(); as d) {
+        @if (view.stadium?.id === d.stadiumId) {
+          <form ngNativeValidate (ngSubmit)="save()">
+            <h2>Edit booking #{{ d.id }}</h2>
+            <fieldset [disabled]="busy()">
+              <div class="fields">
+                <label
+                  >Customer name<input name="customer" [(ngModel)]="d.customerName" required
+                /></label>
+                <label
+                  >Phone (optional)<input name="phone" type="tel" [(ngModel)]="d.customerPhone"
+                /></label>
+                <label
+                  >Start time<input
+                    name="start"
+                    type="datetime-local"
+                    step="any"
+                    [(ngModel)]="d.startTime"
+                    required
+                /></label>
+                <label
+                  >End time<input
+                    name="end"
+                    type="datetime-local"
+                    step="any"
+                    [(ngModel)]="d.endTime"
+                    required
+                /></label>
+              </div>
+              <div class="actions">
+                <button class="primary">Save changes</button>
+                <button type="button" (click)="draft.set(null); error.set('')">
+                  Discard changes
+                </button>
+              </div>
+            </fieldset>
+          </form>
+        }
+      }
+      @if (view.error) {
+        <p class="alert" role="alert">{{ view.error }}</p>
+      } @else if (view.loading) {
+        <p role="status" class="empty">Loading bookings…</p>
+      } @else if (!view.stadium) {
+        <p class="empty">Add a stadium to start scheduling bookings.</p>
+      } @else if (!view.bookings.length) {
+        <p class="empty">No bookings for {{ view.stadium.name }} yet.</p>
+      } @else {
+        <h2>
+          Bookings <span class="count">{{ view.bookings.length }}</span>
+        </h2>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of view.bookings; track r.id) {
+                <tr>
+                  <td>
+                    <strong>{{ r.customerName }}</strong
+                    ><small>{{ r.customerPhone || 'No phone provided' }}</small>
+                  </td>
+                  <td>{{ r.startTime | date: 'medium' }}</td>
+                  <td>{{ r.endTime | date: 'medium' }}</td>
+                  <td>{{ r.totalPrice | number: '1.0-2' }} YER</td>
+                  <td>
+                    <span class="pill" [class.closed]="r.status === 'Cancelled'">{{
+                      r.status
+                    }}</span>
+                  </td>
+                  <td>
+                    <div class="actions">
+                      @if (r.status === 'Confirmed') {
+                        <button [disabled]="busy() || !!draft()" (click)="edit(r)">Edit</button>
+                        <button [disabled]="busy() || !!draft()" (click)="cancel(r)">
+                          Cancel booking
+                        </button>
+                      }
+                      <button class="danger" [disabled]="busy() || !!draft()" (click)="remove(r)">
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  } @else {
+    <p role="status">Loading stadiums…</p>
+  }
+</div>

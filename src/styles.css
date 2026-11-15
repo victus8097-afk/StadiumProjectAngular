@@ -1,1 +1,267 @@
-/* You can add global styles to this file, and also import other style files */
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #f3f6f3;
+  color: #18332e;
+  font:
+    16px/1.5 'Segoe UI',
+    Arial,
+    sans-serif;
+}
+.site-header {
+  background: #123c33;
+  color: white;
+}
+.nav-inner,
+.workspace {
+  width: min(1080px, 94%);
+  margin: auto;
+}
+.nav-inner,
+.page-heading,
+.toolbar,
+.venue-details,
+.actions,
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.nav-inner {
+  padding: 15px 0;
+}
+.brand {
+  font-size: 1.25rem;
+  font-weight: 750;
+  color: white;
+  text-decoration: none;
+}
+.brand span {
+  color: #b7e2a1;
+}
+nav {
+  gap: 0.4rem;
+}
+nav a {
+  color: #e4f2eb;
+  padding: 0.45rem 0.75rem;
+  text-decoration: none;
+  border-radius: 6px;
+}
+nav a.active,
+nav a:hover {
+  background: #315c50;
+  color: white;
+}
+.workspace {
+  padding: clamp(22px, 5vw, 60px) 0;
+}
+.page-heading {
+  margin-bottom: 1.5rem;
+}
+.workspace h1,
+.workspace h2,
+.workspace h3,
+.workspace p {
+  margin: 0;
+}
+.workspace h1 {
+  font-size: clamp(2rem, 5vw, 3.1rem);
+  letter-spacing: -0.045em;
+  line-height: 1.12;
+}
+.kicker {
+  font-size: 0.74rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #476753;
+}
+.workspace .kicker {
+  margin-bottom: 0.3rem;
+}
+.panel {
+  background: white;
+  border: 1px solid #d4dfd7;
+  border-radius: 14px;
+  padding: clamp(16px, 3vw, 30px);
+}
+.workspace h2 {
+  font-size: 1.4rem;
+}
+.workspace h3 {
+  font-size: 1.1rem;
+}
+.workspace label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+.workspace input,
+.workspace select {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #9caea3;
+  border-radius: 6px;
+  padding: 0.58rem 0.7rem;
+  background: white;
+  color: inherit;
+  font: inherit;
+}
+.workspace button,
+.button {
+  display: inline-block;
+  border: 1px solid #c5d2c9;
+  border-radius: 6px;
+  padding: 0.52rem 0.8rem;
+  font:
+    600 0.87rem/1.35 'Segoe UI',
+    sans-serif;
+  background: white;
+  color: #254239;
+  text-decoration: none;
+  cursor: pointer;
+}
+.workspace button:hover,
+.button:hover {
+  background: #edf4ed;
+}
+.workspace .primary {
+  background: #19664c;
+  border-color: #19664c;
+  color: white;
+}
+.workspace .primary:hover {
+  background: #124b38;
+}
+.workspace .danger {
+  color: #953b32;
+}
+.workspace button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+:focus-visible {
+  outline: 3px solid #438ac2;
+  outline-offset: 2px;
+}
+.toolbar {
+  align-items: end;
+  margin-bottom: 1.4rem;
+}
+.count,
+.pill {
+  border-radius: 1rem;
+  padding: 0.2rem 0.6rem;
+  color: #205f43;
+  background: #e4f1e6;
+  font-size: 0.8rem;
+  vertical-align: middle;
+}
+.closed {
+  background: #f2ebe3;
+  color: #765334;
+}
+.venue-list {
+  display: grid;
+  gap: 1rem;
+}
+.venue {
+  border: 1px solid #d7e1da;
+  border-left: 4px solid #85af89;
+  border-radius: 8px;
+  padding: 1rem;
+}
+.venue-details {
+  align-items: start;
+}
+.price {
+  text-align: right;
+}
+.price p {
+  margin-top: 0.4rem;
+}
+.actions {
+  justify-content: flex-start;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.workspace small {
+  display: block;
+  color: #52695c;
+}
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.workspace fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.workspace .estimate,
+.workspace .alert,
+.workspace .success,
+.workspace .empty {
+  padding: 0.85rem 1rem;
+  border-radius: 6px;
+  background: #eff4ee;
+  margin-top: 1rem;
+}
+.workspace .alert,
+.workspace .success {
+  margin: 0 0 1rem;
+}
+.workspace .alert {
+  color: #832c28;
+  background: #ffebe7;
+}
+.workspace .success {
+  color: #215837;
+  background: #ddf1df;
+}
+.scroll {
+  overflow-x: auto;
+}
+.workspace table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  text-align: left;
+}
+.workspace td,
+.workspace th {
+  padding: 0.8rem;
+  border-bottom: 1px solid #dfe7e0;
+}
+.workspace th {
+  background: #f0f5f0;
+}
+@media (max-width: 580px) {
+  .nav-inner {
+    gap: 0.45rem;
+  }
+  nav {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0;
+  }
+  nav a {
+    padding: 0.4rem 0.55rem;
+  }
+  .search,
+  .toolbar label {
+    width: 100%;
+  }
+  .workspace td {
+    min-width: 8rem;
+  }
+}
