@@ -1,3 +1,4 @@
+import { Feature } from '../stadium-api';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -30,6 +31,70 @@ function blankStadium(): Stadium {
 })
 export class StadiumsComponent implements OnInit {
   private readonly api = inject(StadiumApi);
+  readonly features = signal<Feature[]>([]);
+  readonly featuresLoading = signal(false);
+  readonly featureError = signal('');
+  readonly managingFeatures = signal(false);
+  featureName = '';
+  featureId: number | null = null;
+
+  loadFeatures() {
+    this.featuresLoading.set(true);
+    this.featureError.set('');
+    this.api.features().subscribe({
+      next: (rows) => {
+        this.features.set(rows);
+        this.featuresLoading.set(false);
+      },
+      error: (err) => {
+managingFeatures: any;
+        this.featuresLoading.set(false);
+        this.featureError.set(requestError(err, 'Could not load features.'));
+      },
+    });
+  }
+
+  saveFeature() {
+    if (this.busy() || !this.featureName.trim() || this.featureName.trim().length > 100) return;
+    this.busy.set(true);
+    const request =
+      this.featureId === null
+        ? this.api.addFeature(this.featureName.trim())
+        : this.api.updateFeature(this.featureId, this.featureName.trim());
+    request.subscribe({
+      next: () => {
+        this.busy.set(false);
+        this.featureName = '';
+        this.featureId = null;
+        this.loadFeatures();
+        this.load();
+      },
+      error: (err) => this.failed(err),
+    });
+  }
+
+  removeFeature(feature: Feature) {
+    if (this.busy() || !confirm('Delete ' + feature.name + ' from the catalog and all stadiums?'))
+      return;
+    this.busy.set(true);
+    this.api.deleteFeature(feature.id).subscribe({
+      next: () => {
+        this.busy.set(false);
+        this.featureId = null;
+        this.featureName = '';
+        this.loadFeatures();
+        this.load();
+      },
+      error: (err) => this.failed(err),
+    });
+  }
+
+  selectFeature(stadium: Stadium, id: number, checked: boolean) {
+    stadium.featureIds = checked
+      ? [...(stadium.featureIds ?? []), id]
+      : stadium.featureIds?.filter((value) => value !== id);
+  }
+
   readonly rows = signal<Stadium[]>([]);
   readonly query = signal('');
   readonly filtered = computed(() => {
@@ -50,6 +115,7 @@ export class StadiumsComponent implements OnInit {
 
   ngOnInit() {
     this.load();
+    this.loadFeatures();
   }
 
   load() {
@@ -78,6 +144,7 @@ export class StadiumsComponent implements OnInit {
     this.notice.set('');
     const draft = s ? structuredClone(s) : blankStadium();
     draft.bookingPolicy ??= blankStadium().bookingPolicy;
+    draft.featureIds = draft.stadiumFeatures?.map((link) => link.featureId) ?? [];
     this.editor.set(draft);
   }
 
@@ -103,6 +170,10 @@ export class StadiumsComponent implements OnInit {
       return;
     }
     const data = structuredClone(s);
+    data.stadiumFeatures = (data.featureIds ?? []).map((featureId) => ({
+      featureId,
+      feature: this.features().find((f) => f.id === featureId),
+    }));
     if (data.bookingPolicy) {
       for (const key of ['openingTime', 'closingTime'] as const) {
         if (data.bookingPolicy[key].length === 5) data.bookingPolicy[key] += ':00';

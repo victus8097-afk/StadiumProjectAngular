@@ -9,7 +9,15 @@ export interface BookingPolicy {
   cancellationDeadlineHours: number;
 }
 
+export interface Feature {
+featureIds: any;
+  id: number;
+  name: string;
+}
+
 export interface Stadium {
+  featureIds?: number[];
+  stadiumFeatures?: { featureId: number; feature?: Feature }[];
   id: number;
   name: string;
   location: string;
@@ -65,6 +73,18 @@ export function requestError(err: HttpErrorResponse, fallback: string): string {
 export class StadiumApi {
   private readonly http = inject(HttpClient);
   private readonly base = '/api';
+  features() {
+    return this.http.get<Feature[]>(this.base + '/Features');
+  }
+  addFeature(name: string) {
+    return this.http.post<Feature>(this.base + '/Features', { name });
+  }
+  updateFeature(id: number, name: string) {
+    return this.http.put(this.base + '/Features/' + id, { name });
+  }
+  deleteFeature(id: number) {
+    return this.http.delete(this.base + '/Features/' + id);
+  }
   stadiums() {
     return this.http.get<Stadium[]>(this.base + '/Stadiums');
   }

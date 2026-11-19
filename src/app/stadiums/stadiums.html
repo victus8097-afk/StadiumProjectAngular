@@ -17,10 +17,79 @@
     <p class="success" role="status">{{ notice() }}</p>
   }
 
+  @if (!editor() && !bookingStadium()) {
+    <button [disabled]="busy()" (click)="managingFeatures.set(!managingFeatures())">
+      Manage features
+    </button>
+    @if (managingFeatures()) {
+      <section class="panel">
+        <h2>Features</h2>
+        <form ngNativeValidate (ngSubmit)="saveFeature()">
+          <fieldset [disabled]="busy()">
+            <div class="fields">
+              <label
+                >Feature name<input
+                  name="featureName"
+                  [(ngModel)]="featureName"
+                  maxlength="100"
+                  required
+                  placeholder="Parking, lighting, changing rooms…"
+              /></label>
+            </div>
+            <button class="primary">
+              {{ featureId === null ? 'Add feature' : 'Save feature' }}
+            </button>
+            @if (featureId !== null) {
+              <button type="button" (click)="featureId = null; featureName = ''">Discard</button>
+            }
+          </fieldset>
+        </form>
+        @for (f of features(); track f.id) {
+          <div class="toolbar">
+            <span>{{ f.name }}</span>
+            <div class="actions">
+              <button [disabled]="busy()" (click)="featureId = f.id; featureName = f.name">
+                Rename
+              </button>
+              <button class="danger" [disabled]="busy()" (click)="removeFeature(f)">
+                Delete feature
+              </button>
+            </div>
+          </div>
+        }
+        @if (!featuresLoading() && !features().length && !featureError()) {
+          <p>No features yet. Add one above.</p>
+        }
+      </section>
+    }
+  }
+  @if (featureError()) {
+    <p role="alert" class="alert">
+      {{ featureError() }} <button (click)="loadFeatures()">Retry features</button>
+    </p>
+  }
   @if (editor(); as s) {
     <form class="panel" ngNativeValidate (ngSubmit)="save(s)">
       <h2>{{ s.id ? 'Edit stadium' : 'New stadium' }}</h2>
       <fieldset [disabled]="busy()">
+        <h3>Features</h3>
+        @if (featuresLoading()) {
+          <p>Loading features…</p>
+        }
+        <div class="actions">
+          @for (f of features(); track f.id) {
+            <label style="display: flex; align-items: center; gap: 0.5rem">
+              <input
+                style="width: auto"
+                type="checkbox"
+                [name]="'feature-' + f.id"
+                [ngModel]="s.featureIds?.includes(f.id)"
+                (ngModelChange)="selectFeature(s, f.id, $event)"
+              />
+              {{ f.name }}
+            </label>
+          }
+        </div>
         <div class="fields">
           <label
             >Stadium name<input name="name" [(ngModel)]="s.name" required maxlength="150"
@@ -162,6 +231,11 @@
                   <p class="kicker">{{ categories[s.categoryId - 1] || 'Sport' }}</p>
                   <h3>{{ s.name }}</h3>
                   <small>{{ s.location }}</small>
+                  <div class="actions">
+                    @for (link of s.stadiumFeatures; track link.featureId) {
+                      <span class="pill">{{ link.feature?.name }}</span>
+                    }
+                  </div>
                 </div>
                 <div class="price">
                   <span class="pill" [class.closed]="!s.isAvailable">{{
